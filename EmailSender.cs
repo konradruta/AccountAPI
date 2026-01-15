@@ -10,7 +10,7 @@ namespace AccountAPI
         {
             var fromAddress = new MailAddress("kodaziom@wp.pl", "Reset hasła – AccountAPI");
             var toAddress = new MailAddress(to);
-            const string fromPassword = "Chujnia123!";
+            const string fromPassword = "HasłoEmail";
 
             var smtp = new SmtpClient
             {
@@ -30,3 +30,4 @@ namespace AccountAPI
         }
     }
 }
+
