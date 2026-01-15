@@ -77,18 +77,7 @@ app.UseSpaStaticFiles();
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // twoje API
-});
-
-app.UseSpa(spa =>
-{
-    spa.Options.SourcePath = "clientapp";
-
-    if (app.Environment.IsDevelopment())
-    {
-        // W devie proxy do Reactowego serwera (npm start)
-        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-    }
+    endpoints.MapControllers();
 });
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -106,3 +95,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
