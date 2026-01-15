@@ -37,12 +37,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
-
-builder.Services.AddSpaStaticFiles(configuration =>
-{
-    configuration.RootPath = "clientapp/build";
-});
-
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -95,4 +89,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 
