@@ -7,10 +7,21 @@ oraz zarządzanie kontem użytkownika.
 - Rejestracja użytkownika
 - Logowanie użytkownika (JWT)
 - Zarządzanie kontem użytkownika
-- Hashowanie haseł
+- Zmiana hasła użytkownika
+- Wymuszona zmiana hasła przy użyciu hasła tymczasowego
+- Funkcja "Forgot password" z wysyłką hasła tymczasowego e-mailem
+- Reset licznika błędnych logowań po poprawnej autoryzacji
+- Hashowanie haseł (PasswordHasher)
 - Walidacja danych wejściowych (FluentValidation)
 - Globalna obsługa wyjątków (middleware)
 - Swagger / OpenAPI
+
+## Bezpieczeństwo
+- Hasła przechowywane wyłącznie w postaci hashy
+- Weryfikacja starego hasła przed zmianą
+- Obsługa błędnych prób logowania
+- Hasła tymczasowe z wymuszoną zmianą przy logowaniu
+- Autoryzacja oparta o JWT i claims
 
 ## Architektura
 - Controllers – obsługa endpointów API
