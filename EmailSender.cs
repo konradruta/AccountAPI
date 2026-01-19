@@ -8,7 +8,7 @@ namespace AccountAPI
     {
         public void SendEmail(string to, string subject, string body)
         {
-            var fromAddress = new MailAddress("kodaziom@wp.pl", "Reset hasła – AccountAPI");
+            var fromAddress = new MailAddress("email@domena.pl", "Reset hasła – AccountAPI");
             var toAddress = new MailAddress(to);
             const string fromPassword = "HasłoEmail";
 
@@ -30,4 +30,5 @@ namespace AccountAPI
         }
     }
 }
+
 
