@@ -16,6 +16,15 @@ oraz zarządzanie kontem użytkownika.
 - Globalna obsługa wyjątków (middleware)
 - Swagger / OpenAPI
 
+## Role i autoryzacja
+- Role użytkowników przechowywane w bazie danych (`User`, `Admin`)
+- Role przekazywane jako **claims w tokenie JWT**
+- Autoryzacja oparta o **Role-Based Authorization**
+- Ograniczenie dostępu do wybranych endpointów przy użyciu atrybutu:
+  ```csharp
+  [Authorize(Roles = "Admin")]
+-Kontrola dostępu do zasobów w zależności od roli użytkownika
+
 ## Bezpieczeństwo
 - Hasła przechowywane wyłącznie w postaci hashy
 - Weryfikacja starego hasła przed zmianą
