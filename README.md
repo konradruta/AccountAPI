@@ -31,6 +31,7 @@ oraz zarządzanie kontem użytkownika.
 - Obsługa błędnych prób logowania
 - Hasła tymczasowe z wymuszoną zmianą przy logowaniu
 - Autoryzacja oparta o JWT i claims
+- Ochrona wrażliwych endpointów przed dostępem nieautoryzowanym
 
 ## Architektura
 - Controllers – obsługa endpointów API
