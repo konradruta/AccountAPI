@@ -1,4 +1,4 @@
-﻿using AccountAPI.Entities;
+using AccountAPI.Entities;
 using AccountAPI.Models;
 using AccountAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -19,8 +19,6 @@ namespace AccountAPI.Controllers
         }
 
         [HttpGet]
-        /*[Authorize(Roles = "1")]*/
-        [AllowAnonymous]
         public ActionResult<IEnumerable<AccountDto>> GetAll()
         {
             var accounts = _accountService.GetAccounts();
@@ -30,7 +28,6 @@ namespace AccountAPI.Controllers
 
         [HttpGet]
         [Route("byname")]
-        [AllowAnonymous]
         public ActionResult<IEnumerable<AccountDto>> SearchUser(string name)
         {
             var accounts = _accountService.SearchUser(name);
@@ -56,7 +53,7 @@ namespace AccountAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "1")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Add([FromBody] CreateAccountDto dto)
         {
             _accountService.CreateAccount(dto);
@@ -65,7 +62,7 @@ namespace AccountAPI.Controllers
         }
 
         [HttpDelete("{Email}")]
-        [Authorize(Roles = "1")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete([FromRoute] string Email)
         {
             _accountService.DeleteAccount(Email);
@@ -74,7 +71,7 @@ namespace AccountAPI.Controllers
         }
 
         [HttpPut("{Email}")]
-        [Authorize(Roles = "1")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([FromRoute] string Email, [FromBody] EditAccountDto dto)
         {
             _accountService.EditAccount(Email, dto);
