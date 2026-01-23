@@ -1,8 +1,9 @@
-﻿using AccountAPI.Entities;
+using AccountAPI.Entities;
 using AccountAPI.Exceptions;
 using AccountAPI.Migrations;
 using AccountAPI.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -50,7 +51,9 @@ namespace AccountAPI.Services
 
         public string LoginUser(LoginUserDto dto)
         {
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Email == dto.Email);
+            var user = _accountDb.Accounts
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -99,7 +102,7 @@ namespace AccountAPI.Services
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.Name),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name)
             };
