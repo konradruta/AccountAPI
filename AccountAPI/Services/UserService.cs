@@ -65,17 +65,10 @@ namespace AccountAPI.Services
                 user.LastFailedLoginAttempt.Value.AddMinutes(15) < DateTime.UtcNow)
             {
                 user.WrongPasswordCounter = 0;
-            }
-
-            //Licznik błędnych logowań oraz nadawanie blokady i informacji o ostatniej błędnej próbie logowania
-            if (user.WrongPasswordCounter != 4)
-            {
-                user.WrongPasswordCounter++;
-                user.LastFailedLoginAttempt = DateTime.UtcNow;
                 _accountDb.SaveChanges();
             }
 
-            if (user.WrongPasswordCounter == 4)
+            if (user.WrongPasswordCounter >= 4)
             {
                 throw new WrongLoginException("Your account is temporary blocked. To unlock your account change password or wait 15 minutes.");
             }
@@ -84,6 +77,9 @@ namespace AccountAPI.Services
 
             if (passwordVerify == PasswordVerificationResult.Failed)
             {
+                user.WrongPasswordCounter++;
+                user.LastFailedLoginAttempt = DateTime.UtcNow;
+                _accountDb.SaveChanges();
                 throw new WrongLoginException("Wrong email or password");
             }
 
@@ -96,8 +92,6 @@ namespace AccountAPI.Services
             {
                 throw new TemporaryPasswordException("You have to chagne password");
             }
-
-            user.WrongPasswordCounter = 0;
 
             var claims = new List<Claim>()
             {
