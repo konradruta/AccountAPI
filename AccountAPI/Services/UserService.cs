@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace AccountAPI.Services
@@ -14,7 +15,7 @@ namespace AccountAPI.Services
     public interface IUserService
     {
         void RegisterUser(RegisterUserDto dto);
-        string LoginUser(LoginUserDto dto);
+        AuthResponseDto LoginUser(LoginUserDto dto);
         void ChangePassword(ChangePasswordDto dto);
         void ForgotPassword(ForgotPasswordDto dto);
         void ChangePassowrdLogin(LoginChangePassword dto);
@@ -49,7 +50,7 @@ namespace AccountAPI.Services
             _accountDb.SaveChanges();
         }
 
-        public string LoginUser(LoginUserDto dto)
+        public AuthResponseDto LoginUser(LoginUserDto dto)
         {
             var user = _accountDb.Accounts
                 .Include(u => u.Role)
@@ -93,6 +94,24 @@ namespace AccountAPI.Services
                 throw new TemporaryPasswordException("You have to chagne password");
             }
 
+            var accessToken = GenerateJwtToken(user);
+
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime  = DateTime.UtcNow.AddDays(7);
+
+            _accountDb.SaveChanges();
+
+            return new AuthResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+        private string GenerateJwtToken(Account user)
+        {
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -103,7 +122,7 @@ namespace AccountAPI.Services
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpiresDays);
+            var expires = DateTime.UtcNow.AddDays(_authenticationSettings.JwtExpiresDays);
 
             var token = new JwtSecurityToken(_authenticationSettings.JwtIssuer,
                 _authenticationSettings.JwtIssuer,
@@ -111,9 +130,61 @@ namespace AccountAPI.Services
                 expires: expires,
                 signingCredentials: cred);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
-            return tokenHandler.WriteToken(token);
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public AuthResponseDto RefreshToken(RefreshTokenDto dto)
+        {
+            var principal = GetPrincipalFromExpiredToken(dto.AccessToken);
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+
+            if (user == null ||
+                user.RefreshToken != dto.RefreshToken ||
+                user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                throw new SecurityTokenException("Invalid refresh token");
+            }
+
+            var newAccessToken = GenerateJwtToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            _accountDb.SaveChanges();
+
+            return new AuthResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey)),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+
+            return principal;
         }
 
         public void ChangePassword(ChangePasswordDto dto)

@@ -11,5 +11,8 @@
         public bool IsPasswordTemporary { get; set; }
         public int WrongPasswordCounter { get; set; }
         public DateTime? LastFailedLoginAttempt { get; set; }
+
+        public string RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }
