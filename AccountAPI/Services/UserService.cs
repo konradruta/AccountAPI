@@ -151,14 +151,14 @@ namespace AccountAPI.Services
 
         public void ChangePassowrdLogin(LoginChangePassword dto)
         {
-            var userEmail = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userId))
             {
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Email == userEmail);
+            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
 
             if (user == null)
             {
