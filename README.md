@@ -26,7 +26,7 @@ oraz zarządzanie kontem użytkownika.
 - Ograniczenie dostępu do wybranych endpointów przy użyciu atrybutu:
   ```csharp
   [Authorize(Roles = "Admin")]
--Kontrola dostępu do zasobów w zależności od roli użytkownika
+- Kontrola dostępu do zasobów w zależności od roli użytkownika
 
 ## Bezpieczeństwo
 - Hasła przechowywane wyłącznie w postaci hashy
