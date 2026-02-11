@@ -26,7 +26,7 @@ oraz zarządzanie kontem użytkownika.
 - Ograniczenie dostępu do wybranych endpointów przy użyciu atrybutu:
   ```csharp
   [Authorize(Roles = "Admin")]
-- Kontrola dostępu do zasobów w zależności od roli użytkownika
+-Kontrola dostępu do zasobów w zależności od roli użytkownika
 
 ## Bezpieczeństwo
 - Hasła przechowywane wyłącznie w postaci hashy
@@ -81,4 +81,5 @@ https://localhost:7290/swagger
 ## Cel projektu
 Projekt stworzony jako część portfolio backendowego,
 prezentujący implementację bezpiecznego REST API w ASP.NET Core
-z autoryzacją JWT, rolami użytkowników oraz testami jednostkowymi.
+z autoryzacją JWT, mechanizmem refresh token,
+rolami użytkowników oraz testami jednostkowymi.
