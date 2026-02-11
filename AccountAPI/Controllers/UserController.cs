@@ -1,5 +1,6 @@
 ﻿using AccountAPI.Models;
 using AccountAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.X509Certificates;
 
@@ -31,6 +32,24 @@ namespace AccountAPI.Controllers
             return Ok(token);
         }
 
+        [HttpPost("refresh")]
+        public ActionResult RefreshToken([FromBody] RefreshTokenDto dto)
+        {
+            var tokens = _userService.RefreshToken(dto);
+
+            return Ok(tokens);
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public ActionResult Logout()
+        {
+            _userService.Logout();
+
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPost("changePassword")]
         public ActionResult ChangePassowrd([FromBody] ChangePasswordDto dto)
         {

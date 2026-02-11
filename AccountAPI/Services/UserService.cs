@@ -16,6 +16,8 @@ namespace AccountAPI.Services
     {
         void RegisterUser(RegisterUserDto dto);
         AuthResponseDto LoginUser(LoginUserDto dto);
+        AuthResponseDto RefreshToken(RefreshTokenDto dto);
+        void Logout();
         void ChangePassword(ChangePasswordDto dto);
         void ForgotPassword(ForgotPasswordDto dto);
         void ChangePassowrdLogin(LoginChangePassword dto);
@@ -146,7 +148,9 @@ namespace AccountAPI.Services
             var principal = GetPrincipalFromExpiredToken(dto.AccessToken);
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+            var user = _accountDb.Accounts
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Id == Guid.Parse(userId));
 
             if (user == null ||
                 user.RefreshToken != dto.RefreshToken ||
@@ -185,6 +189,23 @@ namespace AccountAPI.Services
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
 
             return principal;
+        }
+
+        public void Logout()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            _accountDb.SaveChanges();
         }
 
         public void ChangePassword(ChangePasswordDto dto)
