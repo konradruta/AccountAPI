@@ -64,10 +64,15 @@ napisane przy użyciu:
 - **Entity Framework Core InMemory** – testowa baza danych
 
 Testy obejmują m.in.:
+
 - rejestrację użytkownika
 - poprawne logowanie użytkownika
 - logowanie z błędnym hasłem
 - próbę logowania nieistniejącego użytkownika
+- generowanie refresh tokena po logowaniu
+- odświeżanie access tokena przy użyciu refresh tokena
+- walidację niepoprawnego refresh tokena
+- unieważnianie sesji użytkownika po wylogowaniu
 
 ## Uruchomienie projektu
 1. Sklonuj repozytorium
