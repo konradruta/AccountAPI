@@ -6,6 +6,9 @@ oraz zarządzanie kontem użytkownika.
 ## Funkcjonalności
 - Rejestracja użytkownika
 - Logowanie użytkownika (JWT)
+- Mechanizm Refresh Token z rotacją tokenów
+- Endpoint odświeżania tokena (Refresh)
+- Wylogowanie użytkownika (unieważnianie refresh tokena)
 - Zarządzanie kontem użytkownika
 - Zmiana hasła użytkownika
 - Wymuszona zmiana hasła przy użyciu hasła tymczasowego
@@ -32,6 +35,9 @@ oraz zarządzanie kontem użytkownika.
 - Hasła tymczasowe z wymuszoną zmianą przy logowaniu
 - Autoryzacja oparta o JWT i claims
 - Ochrona wrażliwych endpointów przed dostępem nieautoryzowanym
+- Access Token posiada krótki czas ważności
+- Refresh Token przechowywany jest w bazie danych
+- Możliwość unieważnienia sesji użytkownika poprzez logout
 
 ## Architektura
 - Controllers – obsługa endpointów API
@@ -58,10 +64,24 @@ napisane przy użyciu:
 - **Entity Framework Core InMemory** – testowa baza danych
 
 Testy obejmują m.in.:
+
 - rejestrację użytkownika
 - poprawne logowanie użytkownika
 - logowanie z błędnym hasłem
 - próbę logowania nieistniejącego użytkownika
+- generowanie refresh tokena po logowaniu
+- odświeżanie access tokena przy użyciu refresh tokena
+- walidację niepoprawnego refresh tokena
+- unieważnianie sesji użytkownika po wylogowaniu
+
+## Uruchomienie w Docker
+Aplikację można uruchomić przy użyciu Docker Compose:
+
+ ```bash
+ docker compose up --build
+```
+Po uruchomieniu aplikacja dostępna jest pod adresem:
+https://localhost:7290/swagger
 
 ## Uruchomienie projektu
 1. Sklonuj repozytorium
@@ -75,4 +95,5 @@ https://localhost:7290/swagger
 ## Cel projektu
 Projekt stworzony jako część portfolio backendowego,
 prezentujący implementację bezpiecznego REST API w ASP.NET Core
-z autoryzacją JWT, rolami użytkowników oraz testami jednostkowymi.
+z autoryzacją JWT, mechanizmem refresh token,
+rolami użytkowników oraz testami jednostkowymi.

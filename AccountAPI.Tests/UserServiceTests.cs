@@ -121,7 +121,8 @@ namespace AccountAPI.Tests
 
             var token = service.LoginUser(dto);
 
-            Assert.False(string.IsNullOrEmpty(token));
+            Assert.NotNull(token.AccessToken);
+            Assert.NotNull(token.RefreshToken);
         }
 
         [Fact]
@@ -164,6 +165,55 @@ namespace AccountAPI.Tests
             };
 
             Assert.Throws<WrongLoginException>(() => service.LoginUser(dto));
+        }
+
+        [Fact]
+        public void RefreshToken_ShouldReturnNewTokens_WhenValid()
+        {
+            var options = new DbContextOptionsBuilder<AccountDbContext>()
+                .UseInMemoryDatabase("RefreshDb")
+                .Options;
+
+            var context = new AccountDbContext(options);
+
+            var role = new Role { Id = 1, Name = "User" };
+
+            var user = new Account
+            {
+                Id = Guid.NewGuid(),
+                Email = "test@test.pl",
+                Name = "Testowy",
+                Role = role,
+                RefreshToken = "old_refresh",
+                RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1)
+            };
+
+            context.Accounts.Add(user);
+            context.SaveChanges();
+
+            var service = CreateService(context);
+
+            _passwordHasherMock
+                .Setup(h => h.VerifyHashedPassword(
+                    It.IsAny<Account>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(PasswordVerificationResult.Success);
+
+            var tokenExpire = service.LoginUser(new LoginUserDto
+            {
+                Email = "test@test.pl",
+                Password = "Password"
+            });
+
+            var token = service.RefreshToken(new RefreshTokenDto
+            {
+                AccessToken = tokenExpire.AccessToken,
+                RefreshToken = tokenExpire.RefreshToken
+            });
+
+            Assert.NotNull(token.AccessToken);
+            Assert.NotNull(token.RefreshToken);
         }
     }
 }
