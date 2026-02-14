@@ -49,7 +49,6 @@ namespace AccountAPI.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpPost("changePassword")]
         public ActionResult ChangePassowrd([FromBody] ChangePasswordDto dto)
         {
@@ -66,6 +65,7 @@ namespace AccountAPI.Controllers
             return Ok($"New password is send on email {dto.Email}");
         }
 
+        [Authorize]
         [HttpPost("LoginChangePassword")]
         public ActionResult LoginChangePassword([FromBody] LoginChangePassword dto)
         {

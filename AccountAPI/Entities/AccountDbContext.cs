@@ -21,6 +21,11 @@ namespace AccountAPI.Entities
                 .WithMany(r => r.Accounts)
                 .HasForeignKey(a => a.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Admin" },
+                new Role { Id = 2, Name = "User" }
+        );
         }
     }
 }
