@@ -74,6 +74,15 @@ Testy obejmują m.in.:
 - walidację niepoprawnego refresh tokena
 - unieważnianie sesji użytkownika po wylogowaniu
 
+## Uruchomienie w Docker
+Aplikację można uruchomić przy użyciu Docker Compose:
+
+ ```bash
+ docker compose up --build
+```
+Po uruchomieniu aplikacja dostępna jest pod adresem:
+https://localhost:7290/swagger
+
 ## Uruchomienie projektu
 1. Sklonuj repozytorium
 2. Skonfiguruj connection string w `appsettings.json`
