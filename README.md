@@ -48,7 +48,7 @@ oraz zarządzanie kontem użytkownika.
 - Migrations – migracje bazy danych (EF Core)
 
 ## Technologie
-- ASP.NET Core
+- ASP.NET Core (.NET 8)
 - C#
 - Entity Framework Core
 - JWT Authentication
