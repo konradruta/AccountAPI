@@ -57,7 +57,7 @@ oraz zarządzanie kontem użytkownika.
 
 ## Testy
 
-# Testy jednostkowe
+### Testy jednostkowe
 Projekt zawiera testy jednostkowe logiki biznesowej (warstwa Services),
 napisane przy użyciu:
 
@@ -76,7 +76,7 @@ Testy obejmują m.in.:
 - walidację niepoprawnego refresh tokena
 - unieważnianie sesji użytkownika po wylogowaniu
 
-# Testy integracyjne
+### Testy integracyjne
 
 Projekt zawiera również testy integracyjne API, które uruchamiają aplikację w środowisku testowym przy użyciu WebApplicationFactory.
 
