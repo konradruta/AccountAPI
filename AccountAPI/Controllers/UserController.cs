@@ -2,6 +2,7 @@
 using AccountAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 
 namespace AccountAPI.Controllers
@@ -38,6 +39,15 @@ namespace AccountAPI.Controllers
             var tokens = _userService.RefreshToken(dto);
 
             return Ok(tokens);
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public ActionResult GetCurrentUser()
+        {
+            var email = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            return Ok(new { email });
         }
 
         [Authorize]
