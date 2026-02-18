@@ -48,7 +48,7 @@ oraz zarządzanie kontem użytkownika.
 - Migrations – migracje bazy danych (EF Core)
 
 ## Technologie
-- ASP.NET Core
+- ASP.NET Core (.NET 8)
 - C#
 - Entity Framework Core
 - JWT Authentication
@@ -56,6 +56,8 @@ oraz zarządzanie kontem użytkownika.
 - Swagger
 
 ## Testy
+
+### Testy jednostkowe
 Projekt zawiera testy jednostkowe logiki biznesowej (warstwa Services),
 napisane przy użyciu:
 
@@ -73,6 +75,17 @@ Testy obejmują m.in.:
 - odświeżanie access tokena przy użyciu refresh tokena
 - walidację niepoprawnego refresh tokena
 - unieważnianie sesji użytkownika po wylogowaniu
+
+### Testy integracyjne
+
+Projekt zawiera również testy integracyjne API, które uruchamiają aplikację w środowisku testowym przy użyciu WebApplicationFactory.
+
+Testy integracyjne obejmują m.in.:
+
+- rejestrację użytkownika poprzez endpoint API
+- logowanie użytkownika i weryfikację generowania tokenów JWT
+- dostęp do chronionych endpointów z tokenem oraz bez tokena
+- weryfikację poprawnego działania autoryzacji i middleware
 
 ## Uruchomienie w Docker
 Aplikację można uruchomić przy użyciu Docker Compose:
