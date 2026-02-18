@@ -76,7 +76,7 @@ Testy obejmują m.in.:
 - walidację niepoprawnego refresh tokena
 - unieważnianie sesji użytkownika po wylogowaniu
 
-#Testy integracyjne
+# Testy integracyjne
 
 Projekt zawiera również testy integracyjne API, które uruchamiają aplikację w środowisku testowym przy użyciu WebApplicationFactory.
 
