@@ -19,62 +19,62 @@ namespace AccountAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<AccountDto>> GetAll()
+        public async Task<ActionResult<IEnumerable<AccountDto>>> GetAll()
         {
-            var accounts = _accountService.GetAccounts();
+            var accounts = await _accountService.GetAccounts();
 
             return Ok(accounts);
         }
 
         [HttpGet]
         [Route("byname")]
-        public ActionResult<IEnumerable<AccountDto>> SearchUser(string name)
+        public async Task<ActionResult<IEnumerable<AccountDto>>> SearchUser(string name)
         {
-            var accounts = _accountService.SearchUser(name);
+            var accounts = await _accountService.SearchUser(name);
 
             return Ok(accounts);
         }
 
         [HttpGet("by-email/{email}")]
-        public ActionResult GetByEmail([FromRoute] string email)
+        public async Task<ActionResult> GetByEmail([FromRoute] string email)
         {
-            var account = _accountService.GetAccountByEmail(email);
+            var account = await _accountService.GetAccountByEmail(email);
 
             return Ok(account);
         }
 
 
         [HttpGet("by-id/{id:guid}")]
-        public ActionResult GetById([FromRoute] Guid id)
+        public async Task<ActionResult> GetById([FromRoute] Guid id)
         {
-            var account = _accountService.GetAccount(id);
+            var account = await _accountService.GetAccount(id);
 
             return Ok(account);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult Add([FromBody] CreateAccountDto dto)
+        public async Task<ActionResult> Add([FromBody] CreateAccountDto dto)
         {
-            _accountService.CreateAccount(dto);
+            await _accountService.CreateAccount(dto);
 
             return Ok();
         }
 
         [HttpDelete("{Email}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Delete([FromRoute] string Email)
+        public async Task<ActionResult> Delete([FromRoute] string Email)
         {
-            _accountService.DeleteAccount(Email);
+            await _accountService.DeleteAccount(Email);
 
             return NoContent();
         }
 
         [HttpPut("{Email}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Edit([FromRoute] string Email, [FromBody] EditAccountDto dto)
+        public async Task<ActionResult> Edit([FromRoute] string Email, [FromBody] EditAccountDto dto)
         {
-            _accountService.EditAccount(Email, dto);
+            await _accountService.EditAccount(Email, dto);
 
             return Ok();
         }

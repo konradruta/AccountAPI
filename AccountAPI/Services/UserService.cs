@@ -14,13 +14,13 @@ namespace AccountAPI.Services
 {
     public interface IUserService
     {
-        void RegisterUser(RegisterUserDto dto);
-        AuthResponseDto LoginUser(LoginUserDto dto);
-        AuthResponseDto RefreshToken(RefreshTokenDto dto);
-        void Logout();
-        void ChangePassword(ChangePasswordDto dto);
-        void ForgotPassword(ForgotPasswordDto dto);
-        void ChangePassowrdLogin(LoginChangePassword dto);
+        Task RegisterUser(RegisterUserDto dto);
+        Task<AuthResponseDto> LoginUser(LoginUserDto dto);
+        Task<AuthResponseDto> RefreshToken(RefreshTokenDto dto);
+        Task Logout();
+        Task ChangePassword(ChangePasswordDto dto);
+        Task ForgotPassword(ForgotPasswordDto dto);
+        Task ChangePassowrdLogin(LoginChangePassword dto);
     }
     public class UserService : IUserService
     {
@@ -38,7 +38,7 @@ namespace AccountAPI.Services
             _emailServices = emailServices;
         }
 
-        public void RegisterUser(RegisterUserDto dto)
+        public async Task RegisterUser(RegisterUserDto dto)
         {
             var newUser = new Account()
             {
@@ -49,14 +49,14 @@ namespace AccountAPI.Services
             newUser.PasswordHash = hashedPassword;
 
             _accountDb.Add(newUser);
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
         }
 
-        public AuthResponseDto LoginUser(LoginUserDto dto)
+        public async Task<AuthResponseDto> LoginUser(LoginUserDto dto)
         {
-            var user = _accountDb.Accounts
+            var user = await _accountDb.Accounts
                 .Include(u => u.Role)
-                .FirstOrDefault(u => u.Email == dto.Email);
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -68,7 +68,6 @@ namespace AccountAPI.Services
                 user.LastFailedLoginAttempt.Value.AddMinutes(15) < DateTime.UtcNow)
             {
                 user.WrongPasswordCounter = 0;
-                _accountDb.SaveChanges();
             }
 
             if (user.WrongPasswordCounter >= 4)
@@ -82,18 +81,17 @@ namespace AccountAPI.Services
             {
                 user.WrongPasswordCounter++;
                 user.LastFailedLoginAttempt = DateTime.UtcNow;
-                _accountDb.SaveChanges();
+                await _accountDb.SaveChangesAsync();
                 throw new WrongLoginException("Wrong email or password");
             }
 
             //Resetowanie licznika błędnych logowań
             user.WrongPasswordCounter = 0;
             user.LastFailedLoginAttempt = null;
-            _accountDb.SaveChanges();
 
             if (user.IsPasswordTemporary == true)
             {
-                throw new TemporaryPasswordException("You have to chagne password");
+                throw new TemporaryPasswordException("You have to change password");
             }
 
             var accessToken = GenerateJwtToken(user);
@@ -103,7 +101,7 @@ namespace AccountAPI.Services
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime  = DateTime.UtcNow.AddDays(7);
 
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
 
             return new AuthResponseDto
             {
@@ -143,14 +141,14 @@ namespace AccountAPI.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        public AuthResponseDto RefreshToken(RefreshTokenDto dto)
+        public async Task<AuthResponseDto> RefreshToken(RefreshTokenDto dto)
         {
             var principal = GetPrincipalFromExpiredToken(dto.AccessToken);
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var user = _accountDb.Accounts
+            var user = await _accountDb.Accounts
                 .Include(u => u.Role)
-                .FirstOrDefault(u => u.Id == Guid.Parse(userId));
+                .FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
 
             if (user == null ||
                 user.RefreshToken != dto.RefreshToken ||
@@ -164,7 +162,7 @@ namespace AccountAPI.Services
 
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
 
             return new AuthResponseDto
             {
@@ -191,7 +189,7 @@ namespace AccountAPI.Services
             return principal;
         }
 
-        public void Logout()
+        public async Task Logout()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -200,17 +198,17 @@ namespace AccountAPI.Services
                 throw new UnauthorizedAccessException();
             }
 
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+            var user = await _accountDb.Accounts.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
 
             user.RefreshToken = null;
             user.RefreshTokenExpiryTime = null;
 
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
         }
 
-        public void ChangePassword(ChangePasswordDto dto)
+        public async Task ChangePassword(ChangePasswordDto dto)
         {
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Email == dto.Email);
+            var user = await _accountDb.Accounts.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -238,10 +236,10 @@ namespace AccountAPI.Services
             user.IsPasswordTemporary = false;
 
 
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
         }
 
-        public void ChangePassowrdLogin(LoginChangePassword dto)
+        public async Task ChangePassowrdLogin(LoginChangePassword dto)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -250,7 +248,7 @@ namespace AccountAPI.Services
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+            var user = await _accountDb.Accounts.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
 
             if (user == null)
             {
@@ -273,12 +271,12 @@ namespace AccountAPI.Services
             user.WrongPasswordCounter = 0;
             user.IsPasswordTemporary = false;
 
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
         }
 
-        public void ForgotPassword(ForgotPasswordDto dto)
+        public async Task ForgotPassword(ForgotPasswordDto dto)
         {
-            var user = _accountDb.Accounts.FirstOrDefault(u => u.Email == dto.Email);
+            var user = await _accountDb.Accounts.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -303,12 +301,12 @@ namespace AccountAPI.Services
             user.PasswordHash = newTempPasswordHash;
             user.IsPasswordTemporary = true;
             user.WrongPasswordCounter = 0;
-            _accountDb.SaveChanges();
+            await _accountDb.SaveChangesAsync();
 
             var subject = "Your new password";
             var body = $"Hello {user.Name}, \n\nYour new temporary password is: {newPassword}";
 
-            _emailServices.SendEmail(user.Email, subject, body);
+            await _emailServices.SendEmail(user.Email, subject, body);
 
             /*return newPassword;*/
         }

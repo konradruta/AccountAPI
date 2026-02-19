@@ -6,7 +6,7 @@ namespace AccountAPI
 {
     public class EmailSender : IEmailSender
     {
-        public void SendEmail(string to, string subject, string body)
+        public async Task SendEmail(string to, string subject, string body)
         {
             var fromAddress = new MailAddress("email@email.pl", "Reset hasła – AccountAPI");
             var toAddress = new MailAddress(to);
@@ -26,7 +26,7 @@ namespace AccountAPI
                 Body = body
             };
 
-            smtp.Send(message);
+            await smtp.SendMailAsync(message);
         }
     }
 }

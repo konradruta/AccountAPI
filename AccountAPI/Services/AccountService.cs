@@ -10,13 +10,13 @@ namespace AccountAPI.Services
 {
     public interface IAccountService
     {
-        IEnumerable<AccountDto> GetAccounts();
-        AccountDto GetAccount(Guid id);
-        Guid CreateAccount(CreateAccountDto dto);
-        bool DeleteAccount(string Email);
-        bool EditAccount(string Email, EditAccountDto dto);
-        AccountDto GetAccountByEmail(string Email);
-        IEnumerable<AccountDto> SearchUser(string userName);
+        Task<IEnumerable<AccountDto>> GetAccounts();
+        Task<AccountDto> GetAccount(Guid id);
+        Task<Guid> CreateAccount(CreateAccountDto dto);
+        Task<bool> DeleteAccount(string Email);
+        Task<bool> EditAccount(string Email, EditAccountDto dto);
+        Task<AccountDto> GetAccountByEmail(string Email);
+        Task<IEnumerable<AccountDto>> SearchUser(string userName);
     }
     public class AccountService : IAccountService
     {
@@ -30,40 +30,40 @@ namespace AccountAPI.Services
             _passwordHasher = passwordHasher;
         }
 
-        public IEnumerable<AccountDto> GetAccounts()
+        public async Task<IEnumerable<AccountDto>> GetAccounts()
         {
-            var accounts = _accountDbContext.Accounts
+            var accounts = await _accountDbContext.Accounts
                 .Include(a => a.Role)
-                .ToList();
+                .ToListAsync();
 
             var accountsMap = _mapper.Map<List<AccountDto>>(accounts);
 
             return accountsMap;
         }
 
-        public AccountDto GetAccountByEmail(string Email)
+        public async Task<AccountDto> GetAccountByEmail(string Email)
         {
-            var account = _accountDbContext.Accounts
+            var account = await _accountDbContext.Accounts
                 .Include(a => a.Role)
-                .FirstOrDefault(a => a.Email == Email);
+                .FirstOrDefaultAsync(a => a.Email == Email);
 
             var accountMap = _mapper.Map<AccountDto>(account);
 
             return accountMap;
         }
 
-        public AccountDto GetAccount(Guid id)
+        public async Task<AccountDto> GetAccount(Guid id)
         {
-            var account = _accountDbContext.Accounts
+            var account = await _accountDbContext.Accounts
                 .Include(a => a.Role)
-                .FirstOrDefault(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             var accountMap = _mapper.Map<AccountDto>(account);
 
             return accountMap;
         }
 
-        public IEnumerable<AccountDto> SearchUser(string userName)
+        public async Task<IEnumerable<AccountDto>> SearchUser(string userName)
         {
             if (userName == null || userName.Length < 3)
             {
@@ -81,14 +81,14 @@ namespace AccountAPI.Services
                 || a.Email.Contains(lowerCaseSearch));
             }
 
-            var listAccount = accounts.ToList();
+            var listAccount = await accounts.ToListAsync();
 
             var accountMap = _mapper.Map<List<AccountDto>>(listAccount);
 
             return accountMap;
         }
 
-        public Guid CreateAccount(CreateAccountDto dto)
+        public async Task<Guid> CreateAccount(CreateAccountDto dto)
         {
             var newAccount = new Account() {
                 Email = dto.Email,
@@ -100,12 +100,12 @@ namespace AccountAPI.Services
 
 
             _accountDbContext.Accounts.Add(newAccount);
-            _accountDbContext.SaveChanges();
+            await _accountDbContext.SaveChangesAsync();
 
             return newAccount.Id;
         }
 
-        public bool DeleteAccount(string Email)
+        public async Task<bool> DeleteAccount(string Email)
         {
             var account = _accountDbContext.Accounts
                 .FirstOrDefault(a => a.Email == Email);
@@ -116,12 +116,12 @@ namespace AccountAPI.Services
             }
 
             _accountDbContext.Accounts.Remove(account);
-            _accountDbContext.SaveChanges();
+            await _accountDbContext.SaveChangesAsync();
 
             return true;
         }
 
-        public bool EditAccount(string Email, EditAccountDto dto)
+        public async Task<bool> EditAccount(string Email, EditAccountDto dto)
         {
             var account = _accountDbContext.Accounts.FirstOrDefault(a => a.Email == Email);
 
@@ -142,7 +142,7 @@ namespace AccountAPI.Services
 
             account.WrongPasswordCounter = 0;
 
-            _accountDbContext.SaveChanges();
+            await _accountDbContext.SaveChangesAsync();
 
             return true;
         }
