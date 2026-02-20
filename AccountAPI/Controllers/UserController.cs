@@ -2,6 +2,7 @@
 using AccountAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 
@@ -25,6 +26,7 @@ namespace AccountAPI.Controllers
             return Ok();
         }
 
+        [EnableRateLimiting("loginLimiter")]
         [HttpPost("login")]
         public async Task<ActionResult> LoginUser([FromBody] LoginUserDto dto)
         {
@@ -33,6 +35,7 @@ namespace AccountAPI.Controllers
             return Ok(token);
         }
 
+        [EnableRateLimiting("refreshTokenLimiter")]
         [HttpPost("refresh")]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenDto dto)
         {
