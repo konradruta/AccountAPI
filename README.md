@@ -1,3 +1,5 @@
+![.NET CI](https://github.com/konradruta/AccountAPI/actions/workflows/dotnet.yml/badge.svg)
+
 # API zarządzania kontami użytkowników
 
 REST API stworzone w ASP.NET Core, umożliwiające rejestrację, logowanie
