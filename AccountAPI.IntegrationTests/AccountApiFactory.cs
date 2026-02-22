@@ -16,6 +16,7 @@ namespace AccountAPI.IntegrationTests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("Testing");
 
             builder.ConfigureServices(services =>
             {
@@ -36,3 +37,4 @@ namespace AccountAPI.IntegrationTests
         }
     }
 }
+
