@@ -107,8 +107,8 @@ namespace AccountAPI.Services
 
         public async Task<bool> DeleteAccount(string Email)
         {
-            var account = _accountDbContext.Accounts
-                .FirstOrDefault(a => a.Email == Email);
+            var account = await _accountDbContext.Accounts
+                .FirstOrDefaultAsync(a => a.Email == Email);
 
             if (account == null)
             {
@@ -123,21 +123,18 @@ namespace AccountAPI.Services
 
         public async Task<bool> EditAccount(string Email, EditAccountDto dto)
         {
-            var account = _accountDbContext.Accounts.FirstOrDefault(a => a.Email == Email);
+            var account = await _accountDbContext.Accounts.FirstOrDefaultAsync(a => a.Email == Email);
 
             if (account == null)
             {
                 return false;
             }
 
-            if (dto.Name != null)
-            {
-                account.Name = dto.Name;
-            }
+            _mapper.Map(dto, account);
 
-            if (dto.RoleId != 0)
+            if (dto.RoleId.HasValue)
             {
-                account.RoleId = dto.RoleId;
+                account.RoleId = dto.RoleId.Value;
             }
 
             account.WrongPasswordCounter = 0;
