@@ -73,14 +73,14 @@ builder.Services.AddRateLimiter(options =>
 
     options.AddFixedWindowLimiter("loginLimiter", opt =>
     {
-        opt.PermitLimit = 10;
+        opt.PermitLimit = 6;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueLimit = 0;
     });
 
     options.AddFixedWindowLimiter("refreshTokenLimiter", opt =>
     {
-        opt.PermitLimit = 15;
+        opt.PermitLimit = 10;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueLimit = 0;
     });
