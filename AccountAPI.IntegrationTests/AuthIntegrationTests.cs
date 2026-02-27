@@ -18,9 +18,11 @@ namespace AccountAPI.IntegrationTests
         [Fact]
         public async Task Register_Should_Return_OK()
         {
+            var email = $"{Guid.NewGuid()}@test.com";
+
             var request = new
             {
-                email = "test1@test.com",
+                email,
                 name = "Testowy",
                 password = "Password123!",
                 confirmPassword = "Password123!"
@@ -34,10 +36,12 @@ namespace AccountAPI.IntegrationTests
         [Fact]
         public async Task Login_Should_Return_Jwt()
         {
+            var email = $"{Guid.NewGuid()}@test.com";
+
             // REGISTER
             var registerRequest = new
             {
-                email = "test2@test.pl",
+                email,
                 name = "Testowy2",
                 password = "Password123!",
                 confirmPassword = "Password123!"
@@ -48,7 +52,7 @@ namespace AccountAPI.IntegrationTests
             // LOGIN
             var request = new
             {
-                email = "test2@test.pl",
+                email,
                 password = "Password123!"
             };
 
@@ -73,10 +77,12 @@ namespace AccountAPI.IntegrationTests
         [Fact]
         public async Task GetMe_With_Token_Should_Return_200()
         {
+            var email = $"{Guid.NewGuid()}@test.com";
+
             // REGISTER
             var registerRequest = new
             {
-                email = "test@test.com",
+                email,
                 name = "Test User",
                 password = "Password123!",
                 confirmPassword = "Password123!",
@@ -87,7 +93,7 @@ namespace AccountAPI.IntegrationTests
             // LOGIN
             var loginRequest = new
             {
-                email = "test@test.com",
+                email,
                 password = "Password123!"
             };
 
