@@ -96,7 +96,7 @@ Aplikację można uruchomić przy użyciu Docker Compose:
  docker compose up --build
 ```
 Po uruchomieniu aplikacja dostępna jest pod adresem:
-https://localhost:7290/swagger
+https://localhost:5000/swagger
 
 ## Uruchomienie projektu
 1. Sklonuj repozytorium
