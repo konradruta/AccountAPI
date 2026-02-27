@@ -1,32 +1,54 @@
 ﻿
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using MimeKit;
+using System.Runtime;
 
 namespace AccountAPI
 {
     public class EmailSender : IEmailSender
     {
+        private readonly EmailSettings _settings;
+
+        public EmailSender(IOptions<EmailSettings> settings)
+        {
+            _settings = settings.Value;
+        }
+
         public async Task SendEmail(string to, string subject, string body)
         {
-            var fromAddress = new MailAddress("email@email.pl", "Reset hasła – AccountAPI");
-            var toAddress = new MailAddress(to);
-            const string fromPassword = "hasloemail";
+            var email = new MimeMessage();
 
-            var smtp = new SmtpClient
+            email.From.Add(new MailboxAddress(
+                _settings.SenderName,
+                _settings.SenderEmail));
+
+            email.To.Add(MailboxAddress.Parse(to));
+            email.Subject = subject;
+
+            email.Body = new TextPart("html")
             {
-                Host = "smtp.wp.pl",
-                Port = 587,
-                EnableSsl = true,
-                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                Text = body
             };
 
-            using var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = body
-            };
+            using var smtp = new SmtpClient();
 
-            await smtp.SendMailAsync(message);
+            await smtp.ConnectAsync(
+                _settings.SmtpServer,
+                _settings.Port,
+                SecureSocketOptions.StartTls);
+
+            await smtp.AuthenticateAsync(
+                _settings.SenderEmail,
+                _settings.Password);
+
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+
+
+
         }
     }
 }

@@ -6,12 +6,13 @@ using AccountAPI.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.RateLimiting;
-using System.Text;
-using Microsoft.AspNetCore.RateLimiting;
+using System;
 using System.Net;
+using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,10 +38,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-
-
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -60,10 +57,13 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginChangePasswordValidato
 builder.Services.AddDbContext<AccountDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnect")));
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 builder.Services.AddAutoMapper(typeof(AccountMappingProfile));
 
@@ -124,6 +124,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<AccountDbContext>();
+
+    db.Database.Migrate();
+}
 
 app.Run();
 

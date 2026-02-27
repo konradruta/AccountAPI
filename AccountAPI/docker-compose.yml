@@ -2,13 +2,18 @@ version: '3.8'
 
 services:
   api:
-    build: ./AccountAPI
+    build: .
     ports:
       - "5000:8080"
     depends_on:
       - db
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Database=AccountDb;User=sa;Password=Your_password123;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    env_file:
+      - .env
+ 
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
