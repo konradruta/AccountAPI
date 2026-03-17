@@ -89,6 +89,17 @@ Testy integracyjne obejmują m.in.:
 - dostęp do chronionych endpointów z tokenem oraz bez tokena
 - weryfikację poprawnego działania autoryzacji i middleware
 
+## Publiczne API
+Aplikacja została wdrożona w Azure App Service i jest dostępna publicznie pod adresem dla Swagger UI:
+https://account-api-app-c6gaa8cug4bsendw.westeurope-01.azurewebsites.net/swagger/index.html
+
+## Wykorzystane usługi Azure
+Projekt wykorzystuje następujące usługi w chmurze Microsoft Azure:
+
+- Azure App Service – hosting aplikacji Web API
+- Azure SQL Database – baza danych aplikacji
+- Azure App Service Deployment Center – integracja z GitHub
+
 ## Uruchomienie w Docker
 Aplikację można uruchomić przy użyciu Docker Compose:
 
