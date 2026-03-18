@@ -1,4 +1,4 @@
-![.NET CI](https://github.com/konradruta/AccountAPI/actions/workflows/dotnet.yml/badge.svg)
+![Build and deploy .NET app to Azure](https://github.com/konradruta/AccountAPI/actions/workflows/dotnet-azure.yml/badge.svg)
 
 # API zarządzania kontami użytkowników
 
