@@ -11,8 +11,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=db;Database=AccountDb;User=sa;Password=Your_password123;
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-    env_file:
-      - .env
+    volumes:
+      - C:/Nauka/AccountAPI/AccountAPI/logs:/app/logs
  
 
   db:

@@ -29,13 +29,15 @@ namespace AccountAPI.Services
         private readonly AuthenticationSettings _authenticationSettings;
         private readonly IEmailSender _emailServices;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(AccountDbContext accountDb, IPasswordHasher<Account> passwordHasher, AuthenticationSettings authenticationSettings, IEmailSender emailServices, IHttpContextAccessor httpContextAccessor)
+        private readonly ILogger<UserService> _logger;
+        public UserService(AccountDbContext accountDb, IPasswordHasher<Account> passwordHasher, AuthenticationSettings authenticationSettings, IEmailSender emailServices, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger)
         {
             _accountDb = accountDb;
             _passwordHasher = passwordHasher;
             _authenticationSettings = authenticationSettings;
             _httpContextAccessor = httpContextAccessor;
             _emailServices = emailServices;
+            _logger = logger;
         }
 
         public async Task RegisterUser(RegisterUserDto dto)
@@ -49,6 +51,9 @@ namespace AccountAPI.Services
             newUser.PasswordHash = hashedPassword;
 
             _accountDb.Add(newUser);
+
+            _logger.LogWarning($"User {dto.Email} created account");
+
             await _accountDb.SaveChangesAsync();
         }
 
@@ -102,6 +107,8 @@ namespace AccountAPI.Services
             user.RefreshTokenExpiryTime  = DateTime.UtcNow.AddDays(7);
 
             await _accountDb.SaveChangesAsync();
+
+            _logger.LogWarning($"User {dto.Email} is logged");
 
             return new AuthResponseDto
             {
@@ -235,6 +242,7 @@ namespace AccountAPI.Services
             user.WrongPasswordCounter = 0;
             user.IsPasswordTemporary = false;
 
+            _logger.LogWarning($"User {dto.Email} changed password");
 
             await _accountDb.SaveChangesAsync();
         }
@@ -271,6 +279,8 @@ namespace AccountAPI.Services
             user.WrongPasswordCounter = 0;
             user.IsPasswordTemporary = false;
 
+            _logger.LogWarning($"User {user.Email} changed password");
+
             await _accountDb.SaveChangesAsync();
         }
 
@@ -305,6 +315,8 @@ namespace AccountAPI.Services
 
             var subject = "Your new password";
             var body = $"Hello {user.Name}, \n\nYour new temporary password is: {newPassword}";
+
+            _logger.LogWarning($"User {user.Email} request new password");
 
             await _emailServices.SendEmail(user.Email, subject, body);
 

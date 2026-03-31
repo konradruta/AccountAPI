@@ -9,12 +9,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using NLog.Web;
 using System;
 using System.Net;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 var authenctiationsettings = new AuthenticationSettings();
 
@@ -135,6 +140,12 @@ using (var scope = app.Services.CreateScope())
         db.Database.Migrate();
     }
 }
+
+app.MapGet("/", (ILogger<Program> logger) =>
+{
+    logger.LogWarning("TEST LOG");
+    return "OK";
+});
 
 app.Run();
 
