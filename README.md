@@ -1,4 +1,4 @@
-![.NET CI](https://github.com/konradruta/AccountAPI/actions/workflows/dotnet.yml/badge.svg)
+![Build and deploy .NET app to Azure](https://github.com/konradruta/AccountAPI/actions/workflows/dotnet-azure.yml/badge.svg)
 
 # API zarządzania kontami użytkowników
 
@@ -88,6 +88,17 @@ Testy integracyjne obejmują m.in.:
 - logowanie użytkownika i weryfikację generowania tokenów JWT
 - dostęp do chronionych endpointów z tokenem oraz bez tokena
 - weryfikację poprawnego działania autoryzacji i middleware
+
+## Publiczne API
+Aplikacja została wdrożona w Azure App Service i jest dostępna publicznie pod adresem dla Swagger UI:
+https://account-api-app-c6gaa8cug4bsendw.westeurope-01.azurewebsites.net/swagger/index.html
+
+## Wykorzystane usługi Azure
+Projekt wykorzystuje następujące usługi w chmurze Microsoft Azure:
+
+- Azure App Service – hosting aplikacji Web API
+- Azure SQL Database – baza danych aplikacji
+- Azure App Service Deployment Center – integracja z GitHub
 
 ## Uruchomienie w Docker
 Aplikację można uruchomić przy użyciu Docker Compose:
