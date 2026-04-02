@@ -19,6 +19,7 @@ oraz zarządzanie kontem użytkownika.
 - Hashowanie haseł (PasswordHasher)
 - Walidacja danych wejściowych (FluentValidation)
 - Globalna obsługa wyjątków (middleware)
+- NLog – logowanie do plików i konsoli
 - Swagger / OpenAPI
 
 ## Role i autoryzacja
