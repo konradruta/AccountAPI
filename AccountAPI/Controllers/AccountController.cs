@@ -28,9 +28,9 @@ namespace AccountAPI.Controllers
 
         [HttpGet]
         [Route("byname")]
-        public async Task<ActionResult<IEnumerable<AccountDto>>> SearchUser(string name)
+        public async Task<ActionResult<IEnumerable<AccountDto>>> SearchUser([FromQuery] string name, [FromQuery] int pageNumber)
         {
-            var accounts = await _accountService.SearchUser(name);
+            var accounts = await _accountService.SearchUser(name, pageNumber);
 
             return Ok(accounts);
         }

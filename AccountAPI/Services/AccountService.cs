@@ -16,7 +16,7 @@ namespace AccountAPI.Services
         Task<bool> DeleteAccount(string Email);
         Task<bool> EditAccount(string Email, EditAccountDto dto);
         Task<AccountDto> GetAccountByEmail(string Email);
-        Task<IEnumerable<AccountDto>> SearchUser(string userName);
+        Task<IEnumerable<AccountDto>> SearchUser(string userName, int pageNumber);
     }
     public class AccountService : IAccountService
     {
@@ -63,7 +63,7 @@ namespace AccountAPI.Services
             return accountMap;
         }
 
-        public async Task<IEnumerable<AccountDto>> SearchUser(string userName)
+        public async Task<IEnumerable<AccountDto>> SearchUser(string userName, int pageNumber)
         {
             if (userName == null || userName.Length < 3)
             {
@@ -74,12 +74,20 @@ namespace AccountAPI.Services
                 .Include(a => a.Role)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(userName))
+            
+            var lowerCaseSearch = userName.ToLower();
+
+            if (pageNumber <= 0 )
             {
-                var lowerCaseSearch = userName.ToLower();
-                accounts = accounts.Where(a => a.Name.ToLower().Contains(lowerCaseSearch)
-                || a.Email.Contains(lowerCaseSearch));
+                pageNumber = 1;
             }
+
+            var pageSize = 5;
+
+            accounts = accounts.Where(a => a.Name.ToLower().Contains(lowerCaseSearch)
+                || a.Email.Contains(lowerCaseSearch))
+                   .Skip(pageSize * (pageNumber - 1))
+                   .Take(pageSize);
 
             var listAccount = await accounts.ToListAsync();
 
