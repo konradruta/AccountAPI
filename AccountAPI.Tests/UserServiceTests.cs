@@ -2,6 +2,7 @@ using AccountAPI.Entities;
 using AccountAPI.Exceptions;
 using AccountAPI.Models;
 using AccountAPI.Services;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace AccountAPI.Tests
         private readonly Mock<IPasswordHasher<Account>> _passwordHasherMock = new();
         private readonly Mock<IEmailSender> _emailSenderMock = new();
         private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
+        private readonly Mock<ILogger<UserService>> _loggerMock = new();
 
         private UserService CreateService(AccountDbContext context)
         {
@@ -29,12 +31,13 @@ namespace AccountAPI.Tests
                 _passwordHasherMock.Object,
                 settings,
                 _emailSenderMock.Object,
-                _httpContextAccessorMock.Object
+                _httpContextAccessorMock.Object,
+                _loggerMock.Object
             );
         }
 
         [Fact]
-        public void RegisterUser_ShouldAddUserToDatabase()
+        public async Task RegisterUser_ShouldAddUserToDatabase()
         {
             var options = new DbContextOptionsBuilder<AccountDbContext>()
                 .UseInMemoryDatabase(databaseName: "RegisterUserDb")
@@ -55,7 +58,7 @@ namespace AccountAPI.Tests
                 Password = "Password123"
             };
 
-            service.RegisterUser(dto);
+            await service.RegisterUser(dto);
 
             Assert.Single(context.Accounts);
         }
@@ -77,11 +80,11 @@ namespace AccountAPI.Tests
                 Password = "Password123"
             };
 
-            Assert.Throws<WrongLoginException>(() => service.LoginUser(dto));
+            Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
         }
 
         [Fact]
-        public void LoginUser_ShouldReturnToken_WhenCredentialsCorrect()
+        public async Task LoginUser_ShouldReturnToken_WhenCredentialsCorrect()
         {
             var options = new DbContextOptionsBuilder<AccountDbContext>()
                 .UseInMemoryDatabase(databaseName: "LoginUserDb2")
@@ -119,7 +122,7 @@ namespace AccountAPI.Tests
                 Password = "Password123"
             };
 
-            var token = service.LoginUser(dto);
+            var token = await service.LoginUser(dto);
 
             Assert.NotNull(token.AccessToken);
             Assert.NotNull(token.RefreshToken);
@@ -164,11 +167,11 @@ namespace AccountAPI.Tests
                 Password = "WrongPassword"
             };
 
-            Assert.Throws<WrongLoginException>(() => service.LoginUser(dto));
+            Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
         }
 
         [Fact]
-        public void RefreshToken_ShouldReturnNewTokens_WhenValid()
+        public async Task RefreshToken_ShouldReturnNewTokens_WhenValid()
         {
             var options = new DbContextOptionsBuilder<AccountDbContext>()
                 .UseInMemoryDatabase("RefreshDb")
@@ -189,7 +192,7 @@ namespace AccountAPI.Tests
             };
 
             context.Accounts.Add(user);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             var service = CreateService(context);
 
@@ -200,13 +203,13 @@ namespace AccountAPI.Tests
                     It.IsAny<string>()))
                 .Returns(PasswordVerificationResult.Success);
 
-            var tokenExpire = service.LoginUser(new LoginUserDto
+            var tokenExpire = await service.LoginUser(new LoginUserDto
             {
                 Email = "test@test.pl",
                 Password = "Password"
             });
 
-            var token = service.RefreshToken(new RefreshTokenDto
+            var token = await service.RefreshToken(new RefreshTokenDto
             {
                 AccessToken = tokenExpire.AccessToken,
                 RefreshToken = tokenExpire.RefreshToken
