@@ -64,7 +64,7 @@ namespace AccountAPI.Tests
         }
 
         [Fact]
-        public void LoginUser_ShouldThrowException_WhenUserNotFound()
+        public async Task LoginUser_ShouldThrowException_WhenUserNotFound()
         {
             var options = new DbContextOptionsBuilder<AccountDbContext>()
                 .UseInMemoryDatabase(databaseName: "LoginUserDb1")
@@ -80,7 +80,7 @@ namespace AccountAPI.Tests
                 Password = "Password123"
             };
 
-            Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
+            await Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
         }
 
         [Fact]
@@ -129,7 +129,7 @@ namespace AccountAPI.Tests
         }
 
         [Fact]
-        public void LoginUser_ShouldThrowException_WhenPasswordIncorrect()
+        public async Task LoginUser_ShouldThrowException_WhenPasswordIncorrect()
         {
             var options = new DbContextOptionsBuilder<AccountDbContext>()
                 .UseInMemoryDatabase(databaseName: "LoginUserDb3")
@@ -167,7 +167,7 @@ namespace AccountAPI.Tests
                 Password = "WrongPassword"
             };
 
-            Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
+            await Assert.ThrowsAsync<WrongLoginException>(() => service.LoginUser(dto));
         }
 
         [Fact]
