@@ -31,6 +31,9 @@ jobs:
     - name: Run tests (list tests)
       run: dotnet test AccountAPI.sln --no-build --list-tests
 
+    - name: Debug solution
+      run: dotnet sln AccountAPI.sln list
+
     - name: Publish project
       run: dotnet publish -c Release -o publish
 
