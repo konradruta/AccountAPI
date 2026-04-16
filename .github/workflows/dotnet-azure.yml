@@ -28,11 +28,8 @@ jobs:
     - name: Build project
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests (list tests)
-      run: dotnet test AccountAPI.sln --no-build --list-tests
-
-    - name: Debug solution
-      run: dotnet sln AccountAPI.sln list
+    - name: Run tests
+      run: dotnet test AccountAPI.sln -c Release
 
     - name: Publish project
       run: dotnet publish -c Release -o publish
